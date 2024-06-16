@@ -1,0 +1,45 @@
+#include <Servo.h>
+
+#define TRIG_PIN 9
+#define ECHO_PIN 8
+#define SERVO_PIN 7
+#define SOUND_SPEED 29.1
+#define SERVO_CLOSE_ANGLE 90
+#define SERVO_OPEN_ANGLE 180
+#define MAX_DISTANCE 180
+
+Servo servo;
+
+void setup() {
+    Serial.begin(9600);
+    pinMode(TRIG_PIN, OUTPUT);
+    pinMode(ECHO_PIN, INPUT);
+    servo.attach(SERVO_PIN);
+}
+
+long getDistance() {
+    digitalWrite(TRIG_PIN, LOW);
+    delayMicroseconds(2);
+    digitalWrite(TRIG_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG_PIN, LOW);
+    long duration = pulseIn(ECHO_PIN, HIGH);
+    long distance = (duration / 2) / SOUND_SPEED;
+    return distance;
+}
+
+void loop() {
+    long distance = getDistance();
+    Serial.print(distance);
+    Serial.println(" cm");
+
+    if (distance < 80) {
+        servo.write(SERVO_CLOSE_ANGLE);
+    } else if (distance < 180) {
+        servo.write(SERVO_OPEN_ANGLE);
+    } else {
+        Serial.println("The distance is more than 180cm");
+    }
+
+    delay(500);
+}
